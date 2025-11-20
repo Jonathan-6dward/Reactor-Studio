@@ -38,3 +38,40 @@ export interface User {
   credits: number;
   avatarUrl: string;
 }
+
+export type BatchSourceType = 'urls' | 'channel' | 'playlist' | 'profile';
+export type BatchStatus = 'pending' | 'downloading' | 'completed' | 'failed';
+
+export interface BatchDownloadItem {
+  id: string;
+  sourceType: BatchSourceType;
+  status: BatchStatus;
+  totalVideos: number;
+  downloadedCount: number;
+  failedCount: number;
+  createdAt: string;
+  sourceData: any; // Stores specific config (channelUrl, username, etc)
+}
+
+export interface DownloadedVideo {
+  videoId: string;
+  title: string;
+  thumbnailUrl: string;
+  duration: string;
+  url: string;
+}
+
+// New types for the public funnel
+export type PlatformType = 'youtube' | 'tiktok' | 'instagram' | 'upload';
+
+export interface PendingVideoData {
+  url?: string;
+  videoId?: string;
+  platform: PlatformType;
+  timestamp: number;
+  // Hydrated data after fetch
+  title?: string;
+  thumbnailUrl?: string;
+  duration?: number; // seconds
+  resolution?: string;
+}

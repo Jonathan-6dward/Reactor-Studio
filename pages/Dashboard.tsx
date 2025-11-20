@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Play, Clock, Trash2, Download } from 'lucide-react';
+import { Plus, Play, Clock, Trash2, Download, Video, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Layout } from '../components/Layout';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
-import { MOCK_PROJECTS } from '../constants';
+import { MOCK_PROJECTS, USER_STATS } from '../constants';
 import { VideoStatus } from '../types';
 
 const Dashboard: React.FC = () => {
@@ -14,17 +14,60 @@ const Dashboard: React.FC = () => {
 
   return (
     <Layout>
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white mb-1">Dashboard</h1>
-          <p className="text-muted">Gerencie seus vídeos de reação com IA.</p>
+          <p className="text-muted">Bem-vindo de volta, Alex.</p>
         </div>
-        <Link to="/create">
-          <Button size="lg" icon={<Plus className="w-5 h-5" />} className="shadow-xl shadow-primary/20">
-            Criar Nova Reação
-          </Button>
-        </Link>
-      </header>
+        
+        <div className="flex gap-3">
+          <Link to="/batch-download">
+             <Button variant="outline" icon={<Download className="w-4 h-4" />}>
+               Download em Massa
+             </Button>
+          </Link>
+          <Link to="/create">
+            <Button icon={<Plus className="w-5 h-5" />} className="shadow-xl shadow-primary/20">
+              Criar Nova Reação
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+        <Card className="p-4 flex items-center gap-4 bg-card/50">
+          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+            <Video className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold">{USER_STATS.totalReactions}</p>
+            <p className="text-xs text-muted font-medium uppercase tracking-wider">Vídeos Criados</p>
+          </div>
+        </Card>
+        
+        <Card className="p-4 flex items-center gap-4 bg-card/50">
+          <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+            <Download className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold">{USER_STATS.totalDownloaded}</p>
+            <p className="text-xs text-muted font-medium uppercase tracking-wider">Vídeos Baixados</p>
+          </div>
+        </Card>
+
+         <Card className="p-4 flex items-center gap-4 bg-card/50">
+          <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center text-success">
+            <Zap className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold">Pro</p>
+            <p className="text-xs text-muted font-medium uppercase tracking-wider">Plano Atual</p>
+          </div>
+        </Card>
+      </div>
+
+      <h2 className="text-xl font-bold mb-4">Projetos Recentes</h2>
 
       {MOCK_PROJECTS.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-accent rounded-3xl bg-card/30">

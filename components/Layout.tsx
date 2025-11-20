@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, Video, LogOut, Settings, Zap } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, Video, LogOut, Settings, Zap, Download } from 'lucide-react';
 import { MOCK_USER } from '../constants';
 import { Button } from './ui/Button';
 
@@ -12,7 +12,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
 
   return (
     <div className="min-h-screen flex bg-background text-text">
@@ -30,13 +30,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <nav className="flex-1 p-4 space-y-2">
           <Link to="/dashboard">
             <Button 
-              variant={isActive('/dashboard') ? 'secondary' : 'ghost'} 
+              variant={location.pathname === '/dashboard' ? 'secondary' : 'ghost'} 
               className="w-full justify-start" 
               icon={<LayoutDashboard className="w-4 h-4" />}
             >
               Dashboard
             </Button>
           </Link>
+          
           <Link to="/create">
             <Button 
               variant={isActive('/create') ? 'secondary' : 'ghost'} 
@@ -46,6 +47,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               Nova Reação
             </Button>
           </Link>
+
+          <Link to="/batch-download">
+            <Button 
+              variant={isActive('/batch-download') ? 'secondary' : 'ghost'} 
+              className="w-full justify-start" 
+              icon={<Download className="w-4 h-4" />}
+            >
+              Download em Massa
+            </Button>
+          </Link>
+
            <Button 
               variant="ghost" 
               className="w-full justify-start text-muted" 
