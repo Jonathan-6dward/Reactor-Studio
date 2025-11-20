@@ -4,7 +4,7 @@ import { Download, Share2, RefreshCcw, Check } from 'lucide-react';
 import { Layout } from '../components/Layout';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import Confetti from 'react-confetti'; // Note: In real app, install this. I'll mock it visually or skip if lib not available. I'll skip to avoid extra dependency issues in this prompt context, using CSS instead.
+import Confetti from 'react-confetti';
 
 const Result: React.FC = () => {
   const { id } = useParams();
@@ -21,9 +21,9 @@ const Result: React.FC = () => {
         {/* Success Banner */}
         <div className="text-center mb-8 animate-fade-in">
            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-             Reaction Video Ready!
+             Vídeo de Reação Pronto!
            </h1>
-           <p className="text-muted">Your AI avatar has successfully reacted to your video.</p>
+           <p className="text-muted">Seu avatar IA reagiu com sucesso ao seu vídeo.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -35,7 +35,7 @@ const Result: React.FC = () => {
                     <img 
                         src="https://picsum.photos/seed/result/800/450" 
                         className="w-full h-full object-cover opacity-60"
-                        alt="Video Result"
+                        alt="Resultado do Vídeo"
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
                         <div className="w-16 h-16 bg-white/10 backdrop-blur rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
@@ -60,25 +60,25 @@ const Result: React.FC = () => {
            {/* Sidebar Actions */}
            <div className="space-y-6">
               <Card className="p-6">
-                  <h3 className="font-semibold mb-4 text-lg">Details</h3>
+                  <h3 className="font-semibold mb-4 text-lg">Detalhes</h3>
                   <div className="space-y-3 text-sm">
                       <div className="flex justify-between border-b border-accent pb-2">
-                          <span className="text-muted">Duration</span>
+                          <span className="text-muted">Duração</span>
                           <span>1m 45s</span>
                       </div>
                       <div className="flex justify-between border-b border-accent pb-2">
-                          <span className="text-muted">Resolution</span>
+                          <span className="text-muted">Resolução</span>
                           <span>1080p</span>
                       </div>
                        <div className="flex justify-between border-b border-accent pb-2">
-                          <span className="text-muted">Size</span>
+                          <span className="text-muted">Tamanho</span>
                           <span>45 MB</span>
                       </div>
                   </div>
 
                   <div className="mt-6 space-y-3">
                       <Button className="w-full" size="lg" icon={<Download className="w-4 h-4"/>}>
-                          Download MP4
+                          Baixar MP4
                       </Button>
                       <Button 
                         variant="outline" 
@@ -86,17 +86,17 @@ const Result: React.FC = () => {
                         icon={copied ? <Check className="w-4 h-4 text-success"/> : <Share2 className="w-4 h-4"/>}
                         onClick={handleCopy}
                       >
-                          {copied ? "Link Copied!" : "Share Link"}
+                          {copied ? "Link Copiado!" : "Compartilhar"}
                       </Button>
                   </div>
               </Card>
 
               <Card className="p-6 bg-primary/5 border-primary/10">
-                  <h3 className="font-semibold mb-2">What's next?</h3>
-                  <p className="text-sm text-muted mb-4">Create another reaction with a different avatar or style.</p>
+                  <h3 className="font-semibold mb-2">O que vem a seguir?</h3>
+                  <p className="text-sm text-muted mb-4">Crie outra reação com um avatar ou estilo diferente.</p>
                   <Link to="/create">
                      <Button variant="secondary" className="w-full" icon={<RefreshCcw className="w-4 h-4"/>}>
-                         Create New
+                         Criar Novo
                      </Button>
                   </Link>
               </Card>

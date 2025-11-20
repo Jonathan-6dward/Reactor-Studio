@@ -9,10 +9,10 @@ import { PRESET_AVATARS } from '../constants';
 import { ReactionConfig } from '../types';
 
 const steps = [
-  { id: 1, title: 'Upload Video', icon: Upload },
-  { id: 2, title: 'Choose Avatar', icon: UserIcon },
-  { id: 3, title: 'Customize', icon: Settings2 },
-  { id: 4, title: 'Review', icon: CheckCircle },
+  { id: 1, title: 'Upload Vídeo', icon: Upload },
+  { id: 2, title: 'Escolher Avatar', icon: UserIcon },
+  { id: 3, title: 'Personalizar', icon: Settings2 },
+  { id: 4, title: 'Revisão', icon: CheckCircle },
 ];
 
 const Create: React.FC = () => {
@@ -90,8 +90,8 @@ const Create: React.FC = () => {
                     <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6">
                       <Upload className="w-10 h-10 text-primary" />
                     </div>
-                    <h3 className="text-2xl font-bold mb-2">Upload your video</h3>
-                    <p className="text-muted mb-8 max-w-sm">Drag and drop your video file here, or click to browse. Supports MP4, MOV (Max 100MB).</p>
+                    <h3 className="text-2xl font-bold mb-2">Faça upload do seu vídeo</h3>
+                    <p className="text-muted mb-8 max-w-sm">Arraste e solte seu arquivo de vídeo aqui, ou clique para procurar. Suporta MP4, MOV (Max 100MB).</p>
                     
                     <input 
                       type="file" 
@@ -107,7 +107,7 @@ const Create: React.FC = () => {
                         size="lg" 
                         className="cursor-pointer"
                       >
-                        Select File
+                        Selecionar Arquivo
                       </Button>
                     </label>
 
@@ -132,7 +132,7 @@ const Create: React.FC = () => {
               {/* Step 2: Avatar */}
               {currentStep === 2 && (
                 <div>
-                  <h3 className="text-xl font-bold mb-4">Choose your AI Persona</h3>
+                  <h3 className="text-xl font-bold mb-4">Escolha sua Persona IA</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {PRESET_AVATARS.map((avatar) => (
                       <div 
@@ -158,12 +158,12 @@ const Create: React.FC = () => {
                   
                   <div className="mt-8 flex items-center gap-4">
                     <div className="flex-1 h-px bg-accent" />
-                    <span className="text-muted text-sm">OR</span>
+                    <span className="text-muted text-sm">OU</span>
                     <div className="flex-1 h-px bg-accent" />
                   </div>
                   
                   <div className="mt-4 text-center">
-                     <Button variant="outline" icon={<Upload className="w-4 h-4"/>}>Upload Custom Photo</Button>
+                     <Button variant="outline" icon={<Upload className="w-4 h-4"/>}>Carregar Foto Personalizada</Button>
                   </div>
                 </div>
               )}
@@ -173,13 +173,13 @@ const Create: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <Card className="p-6">
                     <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <Settings2 className="w-5 h-5 text-primary"/> Reaction Style
+                        <Settings2 className="w-5 h-5 text-primary"/> Estilo da Reação
                     </h3>
                     <div className="space-y-3">
                         {[
-                            { id: 'quick', label: '⚡ Quick Reaction', desc: 'Short, punchy comments' },
-                            { id: 'analysis', label: '💬 Deep Analysis', desc: 'Detailed observations and thoughts' },
-                            { id: 'comedy', label: '😂 Comedy Mode', desc: 'Funny, sarcastic commentary' },
+                            { id: 'quick', label: '⚡ Reação Rápida', desc: 'Comentários curtos e diretos' },
+                            { id: 'analysis', label: '💬 Análise Profunda', desc: 'Observações detalhadas' },
+                            { id: 'comedy', label: '😂 Modo Comédia', desc: 'Comentários engraçados e sarcásticos' },
                         ].map(opt => (
                             <div 
                                 key={opt.id}
@@ -194,24 +194,24 @@ const Create: React.FC = () => {
                   </Card>
 
                   <Card className="p-6">
-                    <h3 className="text-lg font-semibold mb-4">Voice & Position</h3>
+                    <h3 className="text-lg font-semibold mb-4">Voz & Posição</h3>
                     <div className="space-y-6">
                         <div>
-                            <label className="text-sm font-medium mb-2 block text-muted">AI Voice</label>
+                            <label className="text-sm font-medium mb-2 block text-muted">Voz IA</label>
                             <select 
                                 className="w-full bg-background border border-accent rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-primary focus:outline-none"
                                 value={config.voice}
                                 onChange={(e) => setConfig({...config, voice: e.target.value as any})}
                             >
-                                <option value="female">Rachel (Female, Energetic)</option>
-                                <option value="male_deep">Marcus (Male, Deep)</option>
-                                <option value="male_mid">Caleb (Male, Casual)</option>
-                                <option value="neutral">Sam (Neutral)</option>
+                                <option value="female">Rachel (Feminina, Energética)</option>
+                                <option value="male_deep">Marcus (Masculina, Grave)</option>
+                                <option value="male_mid">Caleb (Masculina, Casual)</option>
+                                <option value="neutral">Sam (Neutra)</option>
                             </select>
                         </div>
 
                         <div>
-                            <label className="text-sm font-medium mb-2 block text-muted">Avatar Size: {config.size}%</label>
+                            <label className="text-sm font-medium mb-2 block text-muted">Tamanho do Avatar: {config.size}%</label>
                             <input 
                                 type="range" 
                                 min="15" 
@@ -223,7 +223,7 @@ const Create: React.FC = () => {
                         </div>
 
                         <div>
-                           <label className="text-sm font-medium mb-2 block text-muted">Position</label>
+                           <label className="text-sm font-medium mb-2 block text-muted">Posição</label>
                            <div className="grid grid-cols-2 gap-2">
                                {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map(pos => (
                                    <button
@@ -231,7 +231,7 @@ const Create: React.FC = () => {
                                      onClick={() => setConfig({...config, position: pos as any})}
                                      className={`p-2 text-xs border rounded ${config.position === pos ? 'bg-primary text-white border-primary' : 'border-accent text-muted'}`}
                                    >
-                                     {pos.replace('-', ' ').toUpperCase()}
+                                     {pos.replace('-', ' ').replace('top', 'Superior').replace('bottom', 'Inferior').replace('left', 'Esq.').replace('right', 'Dir.')}
                                    </button>
                                ))}
                            </div>
@@ -245,29 +245,31 @@ const Create: React.FC = () => {
               {currentStep === 4 && (
                  <div className="max-w-2xl mx-auto">
                     <Card className="p-6 border-primary/30 bg-gradient-to-b from-card to-background">
-                        <h3 className="text-2xl font-bold mb-6 text-center">Ready to generate?</h3>
+                        <h3 className="text-2xl font-bold mb-6 text-center">Pronto para gerar?</h3>
                         
                         <div className="space-y-4 mb-8">
                             <div className="flex justify-between items-center py-3 border-b border-accent">
-                                <span className="text-muted">Video</span>
-                                <span className="font-medium">{config.videoFile?.name || "Sample_Video.mp4"}</span>
+                                <span className="text-muted">Vídeo</span>
+                                <span className="font-medium">{config.videoFile?.name || "Video_Exemplo.mp4"}</span>
                             </div>
                              <div className="flex justify-between items-center py-3 border-b border-accent">
                                 <span className="text-muted">Avatar</span>
-                                <span className="font-medium">{PRESET_AVATARS.find(a => a.id === config.avatarId)?.name || "Not selected"}</span>
+                                <span className="font-medium">{PRESET_AVATARS.find(a => a.id === config.avatarId)?.name || "Não selecionado"}</span>
                             </div>
                              <div className="flex justify-between items-center py-3 border-b border-accent">
-                                <span className="text-muted">Style</span>
-                                <span className="capitalize font-medium">{config.style}</span>
+                                <span className="text-muted">Estilo</span>
+                                <span className="capitalize font-medium">
+                                    {config.style === 'quick' ? 'Reação Rápida' : config.style === 'analysis' ? 'Análise Profunda' : 'Comédia'}
+                                </span>
                             </div>
                              <div className="flex justify-between items-center py-3 border-b border-accent">
-                                <span className="text-muted">Voice</span>
+                                <span className="text-muted">Voz</span>
                                 <span className="capitalize font-medium">{config.voice}</span>
                             </div>
                         </div>
 
                         <div className="bg-accent/20 p-4 rounded-lg mb-6 text-xs text-muted text-center">
-                            By clicking generate, you'll use 1 credit from your free plan. Estimated time: 2 minutes.
+                            Ao clicar em gerar, você usará 1 crédito do seu plano gratuito. Tempo estimado: 2 minutos.
                         </div>
                     </Card>
                  </div>
@@ -284,7 +286,7 @@ const Create: React.FC = () => {
             disabled={currentStep === 1}
             icon={<ChevronLeft className="w-4 h-4"/>}
           >
-            Back
+            Voltar
           </Button>
           
           <Button 
@@ -295,11 +297,11 @@ const Create: React.FC = () => {
           >
             {currentStep === 4 ? (
                 <>
-                 Generate <span className="ml-2">🚀</span>
+                 Gerar Vídeo <span className="ml-2">🚀</span>
                 </>
             ) : (
                 <>
-                 Next <ChevronRight className="w-4 h-4 ml-1"/>
+                 Próximo <ChevronRight className="w-4 h-4 ml-1"/>
                 </>
             )}
           </Button>

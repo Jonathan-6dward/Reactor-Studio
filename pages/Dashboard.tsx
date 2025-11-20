@@ -17,11 +17,11 @@ const Dashboard: React.FC = () => {
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white mb-1">Dashboard</h1>
-          <p className="text-muted">Manage your AI reaction videos.</p>
+          <p className="text-muted">Gerencie seus vídeos de reação com IA.</p>
         </div>
         <Link to="/create">
           <Button size="lg" icon={<Plus className="w-5 h-5" />} className="shadow-xl shadow-primary/20">
-            Create New Reaction
+            Criar Nova Reação
           </Button>
         </Link>
       </header>
@@ -31,10 +31,10 @@ const Dashboard: React.FC = () => {
           <div className="w-20 h-20 bg-accent/50 rounded-full flex items-center justify-center mb-6">
             <Play className="w-10 h-10 text-muted" />
           </div>
-          <h3 className="text-xl font-bold text-white mb-2">No videos yet</h3>
-          <p className="text-muted max-w-md mb-8">Create your first AI reaction video. It takes less than 2 minutes!</p>
+          <h3 className="text-xl font-bold text-white mb-2">Nenhum vídeo ainda</h3>
+          <p className="text-muted max-w-md mb-8">Crie seu primeiro vídeo de reação com IA. Leva menos de 2 minutos!</p>
           <Link to="/create">
-             <Button>Get Started</Button>
+             <Button>Começar Agora</Button>
           </Link>
         </div>
       ) : (
@@ -57,7 +57,7 @@ const Dashboard: React.FC = () => {
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-sm">
                      {project.status === VideoStatus.COMPLETED && (
                        <Button size="sm" variant="primary" icon={<Play className="w-4 h-4"/>} onClick={() => navigate(`/result/${project.id}`)}>
-                         View
+                         Ver Vídeo
                        </Button>
                      )}
                   </div>
@@ -84,13 +84,13 @@ const Dashboard: React.FC = () => {
                 <div className="flex items-center justify-between pt-4 border-t border-accent">
                    <button 
                     className="text-muted hover:text-primary transition-colors p-1"
-                    title="Download"
+                    title="Baixar"
                    >
                      <Download className="w-4 h-4" />
                    </button>
                    <button 
                     className="text-muted hover:text-error transition-colors p-1"
-                    title="Delete"
+                    title="Excluir"
                    >
                      <Trash2 className="w-4 h-4" />
                    </button>

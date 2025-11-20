@@ -59,8 +59,8 @@ const Processing: React.FC = () => {
             </div>
           </motion.div>
 
-          <h2 className="text-2xl font-bold mb-2">Creating Magic</h2>
-          <p className="text-muted mb-8">Please keep this tab open while we generate your reaction video.</p>
+          <h2 className="text-2xl font-bold mb-2">Criando Mágica</h2>
+          <p className="text-muted mb-8">Por favor, mantenha esta aba aberta enquanto geramos seu vídeo de reação.</p>
 
           <Card className="p-8 bg-card/50 border-primary/20">
             <ProgressBar progress={progress} className="mb-4" />

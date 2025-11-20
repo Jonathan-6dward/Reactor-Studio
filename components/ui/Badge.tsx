@@ -14,10 +14,10 @@ export const Badge: React.FC<BadgeProps> = ({ status }) => {
   };
 
   const labels = {
-    [VideoStatus.COMPLETED]: "Ready",
-    [VideoStatus.PROCESSING]: "Processing",
-    [VideoStatus.QUEUED]: "Queued",
-    [VideoStatus.FAILED]: "Failed",
+    [VideoStatus.COMPLETED]: "Pronto",
+    [VideoStatus.PROCESSING]: "Processando",
+    [VideoStatus.QUEUED]: "Na Fila",
+    [VideoStatus.FAILED]: "Falhou",
   };
 
   return (
