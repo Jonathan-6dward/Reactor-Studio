@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play, Settings2, Zap, LayoutTemplate, Mic } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft, Play, Zap, LayoutTemplate, Mic, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { CreateReactionRequest, VideoAnalysisResult, Avatar } from '../types';
 import { api } from '../services/api';
 import { useToast } from '../components/ui/Toast';
+import { useAuth } from '../contexts/AuthContext';
+import { LoginModal } from '../components/auth/LoginModal';
 
 const Customize: React.FC = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
+  const { isAuthenticated, login } = useAuth();
+  
   const [config, setConfig] = useState({
     style: 'quick',
     voice: 'female',
@@ -19,36 +23,40 @@ const Customize: React.FC = () => {
   });
   
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [videoData, setVideoData] = useState<VideoAnalysisResult | null>(null);
   const [avatarData, setAvatarData] = useState<Avatar | null>(null);
 
   useEffect(() => {
-    // Retrieve data from "Analysis" and "Avatar" steps (in this demo flow, using api service to fetch from temp storage)
-    // Note: In a real full app, we might pass ID in URL or Context. Here we grab from previous steps logic.
-    
-    // For this demo, we assume the user just came from ChooseAvatar, which saved selection to localstorage.
-    // And Preview saved video id.
-    
-    // Let's try to get the last uploaded video ID from the api service state if possible, 
-    // but since api is stateless class in this simple implementation, we rely on our 'temp' db logic.
-    // To make it robust for the "Customize" page reload, we'd need URL params. 
-    // For now, we assume the flow was followed.
-    
-    // ... (Simplified retrieval logic for demo)
     const storedAvatar = localStorage.getItem('selectedAvatar');
     if (storedAvatar) setAvatarData(JSON.parse(storedAvatar));
 
-    // Retrieving video is trickier without ID in URL in this specific file version. 
-    // We will assume the `pendingVideo` in localStorage (from VideoInput) is the one we are working on.
     const pendingVideo = localStorage.getItem('pendingVideo');
     if (pendingVideo) setVideoData(JSON.parse(pendingVideo));
   }, []);
 
-  const handleGenerate = async () => {
-    if (!videoData || !avatarData) {
+  const handleGenerateClick = () => {
+      if (!videoData || !avatarData) {
         addToast("Dados do vídeo ou avatar incompletos.", "error");
         return;
-    }
+      }
+
+      if (!isAuthenticated) {
+          setShowLoginModal(true);
+      } else {
+          startGeneration();
+      }
+  };
+
+  const handleLoginSuccess = () => {
+      login();
+      setShowLoginModal(false);
+      // Small delay to allow state update before starting
+      setTimeout(() => startGeneration(), 500);
+  };
+
+  const startGeneration = async () => {
+    if (!videoData || !avatarData) return;
     
     setIsGenerating(true);
     
@@ -76,13 +84,35 @@ const Customize: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <LoginModal 
+        isOpen={showLoginModal} 
+        onClose={() => setShowLoginModal(false)} 
+        onLogin={handleLoginSuccess} 
+      />
+
       <header className="border-b border-accent bg-background/80 backdrop-blur sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-muted hover:text-white">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => navigate('/choose-avatar')} 
+            className="text-muted hover:text-white"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
           </Button>
-          <span className="font-bold tracking-tight">Reactor Studio</span>
-          <div className="w-24" />
+          
+          <Link to="/" className="flex items-center gap-2 font-bold tracking-tight hover:text-primary transition-colors">
+             <div className="w-8 h-8 bg-gradient-to-tr from-primary to-secondary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
+                <Zap className="w-5 h-5 text-white" />
+             </div>
+             Reactor Studio
+          </Link>
+          
+          <Link to="/">
+             <Button variant="ghost" size="sm" icon={<Home className="w-4 h-4" />}>
+                 Home
+             </Button>
+          </Link>
         </div>
       </header>
 
@@ -262,13 +292,15 @@ const Customize: React.FC = () => {
                         <Button 
                             size="lg" 
                             className="w-full h-12 text-lg shadow-lg shadow-primary/25"
-                            onClick={handleGenerate}
+                            onClick={handleGenerateClick}
                             isLoading={isGenerating}
                         >
-                            Gerar Vídeo Mágico ✨
+                            {isAuthenticated ? 'Gerar Vídeo Mágico ✨' : 'Entrar e Gerar Vídeo 🚀'}
                         </Button>
                         <p className="text-xs text-center mt-3 text-muted">
-                            Ao continuar, você usará 1 crédito.
+                            {isAuthenticated 
+                                ? 'Ao continuar, você usará 1 crédito do seu plano.' 
+                                : 'Crie uma conta grátis para salvar e processar seu vídeo.'}
                         </p>
                     </div>
                 </Card>

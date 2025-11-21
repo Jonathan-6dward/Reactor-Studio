@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Landing from './pages/Landing';
@@ -13,33 +14,36 @@ import ChooseAvatar from './pages/ChooseAvatar';
 import Customize from './pages/Customize';
 import ImageGenerator from './pages/ImageGenerator';
 import { ToastProvider } from './components/ui/Toast';
+import { AuthProvider } from './contexts/AuthContext';
 
 const App: React.FC = () => {
   return (
     <ToastProvider>
-      <Router>
-        <Routes>
-          {/* Public Funnel */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/preview" element={<Preview />} />
-          <Route path="/choose-avatar" element={<ChooseAvatar />} />
-          <Route path="/customize" element={<Customize />} />
+      <AuthProvider>
+        <Router>
+          <Routes>
+            {/* Public Funnel */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/preview" element={<Preview />} />
+            <Route path="/choose-avatar" element={<ChooseAvatar />} />
+            <Route path="/customize" element={<Customize />} />
 
-          {/* Protected Routes */}
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/create" element={<Create />} /> {/* Legacy/Power User route */}
-          <Route path="/processing/:id" element={<Processing />} />
-          <Route path="/result/:id" element={<Result />} />
-          
-          {/* Batch Download Routes */}
-          <Route path="/batch-download" element={<BatchDownload />} />
-          <Route path="/batch-download/history" element={<BatchHistory />} />
-          <Route path="/batch-download/:id" element={<BatchStatus />} />
+            {/* Protected Routes (Ideally wrapped in a PrivateRoute component, but functionally protected by logic for now) */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/create" element={<Create />} /> {/* Legacy/Power User route */}
+            <Route path="/processing/:id" element={<Processing />} />
+            <Route path="/result/:id" element={<Result />} />
+            
+            {/* Batch Download Routes */}
+            <Route path="/batch-download" element={<BatchDownload />} />
+            <Route path="/batch-download/history" element={<BatchHistory />} />
+            <Route path="/batch-download/:id" element={<BatchStatus />} />
 
-          {/* Image Generator */}
-          <Route path="/image-generator" element={<ImageGenerator />} />
-        </Routes>
-      </Router>
+            {/* Image Generator */}
+            <Route path="/image-generator" element={<ImageGenerator />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
     </ToastProvider>
   );
 };

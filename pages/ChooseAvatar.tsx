@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Upload, User, History, Info } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, Upload, User, History, Info, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '../components/ui/Button';
 import { AvatarGallery } from '../components/avatar/AvatarGallery';
@@ -28,6 +28,17 @@ const ChooseAvatar: React.FC = () => {
     navigate('/customize');
   };
 
+  const handleBack = () => {
+      // Retrieve pending video to construct the correct back URL
+      const pendingVideo = localStorage.getItem('pendingVideo');
+      if (pendingVideo) {
+          const { videoId } = JSON.parse(pendingVideo);
+          navigate(`/preview?videoId=${videoId}`);
+      } else {
+          navigate('/');
+      }
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="border-b border-accent bg-background/80 backdrop-blur sticky top-0 z-50">
@@ -35,13 +46,20 @@ const ChooseAvatar: React.FC = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate(-1)}
+            onClick={handleBack}
             className="text-muted hover:text-white"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
           </Button>
-          <span className="font-bold tracking-tight">Reactor Studio</span>
+          
+          <Link to="/" className="flex items-center gap-2 font-bold tracking-tight hover:text-primary transition-colors">
+             <div className="w-8 h-8 bg-gradient-to-tr from-primary to-secondary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
+                <Zap className="w-5 h-5 text-white" />
+             </div>
+             Reactor Studio
+          </Link>
+
           <div className="w-24" />
         </div>
       </header>

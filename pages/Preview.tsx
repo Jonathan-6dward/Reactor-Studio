@@ -1,7 +1,6 @@
-
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, Loader2, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '../components/ui/Button';
 import { VideoPreviewCard } from '../components/video/VideoPreviewCard';
@@ -17,14 +16,16 @@ const Preview: React.FC = () => {
   useEffect(() => {
     const fetchVideo = async () => {
       const videoId = searchParams.get('videoId');
-      // Fallback to url parameter if just pasted (less robust but handles direct link case if implemented)
       const url = searchParams.get('url'); 
       
+      // 1. Try URL Params
       if (videoId) {
         try {
            const data = await api.getVideo(videoId);
            if (data) {
              setVideoData(data);
+             // Update local storage to persist state for forward/backward navigation
+             localStorage.setItem('pendingVideo', JSON.stringify(data));
            } else {
              navigate('/'); // Not found
            }
@@ -32,16 +33,25 @@ const Preview: React.FC = () => {
            console.error(e);
            navigate('/');
         }
-      } else if (url) {
-         // Should ideally be handled by VideoInput, but for safety:
+      } 
+      // 2. Try direct analysis URL
+      else if (url) {
          try {
              const data = await api.analyzeVideo(url);
              setVideoData(data);
+             localStorage.setItem('pendingVideo', JSON.stringify(data));
          } catch (e) {
              navigate('/');
          }
-      } else {
-        navigate('/');
+      } 
+      // 3. Fallback to Local Storage (allows coming back from Choose Avatar without params)
+      else {
+        const stored = localStorage.getItem('pendingVideo');
+        if (stored) {
+            setVideoData(JSON.parse(stored));
+        } else {
+            navigate('/');
+        }
       }
       setLoading(false);
     };
@@ -66,17 +76,23 @@ const Preview: React.FC = () => {
       {/* Header */}
       <header className="border-b border-accent bg-background/80 backdrop-blur sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/')}
-            className="text-muted hover:text-white"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar
-          </Button>
+          <Link to="/">
+            <Button
+                variant="ghost"
+                size="sm"
+                className="text-muted hover:text-white"
+            >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Voltar
+            </Button>
+          </Link>
           
-          <span className="font-bold tracking-tight">Reactor Studio</span>
+          <Link to="/" className="flex items-center gap-2 font-bold tracking-tight hover:text-primary transition-colors">
+             <div className="w-8 h-8 bg-gradient-to-tr from-primary to-secondary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
+                <Zap className="w-5 h-5 text-white" />
+             </div>
+             Reactor Studio
+          </Link>
           
           <div className="w-24" /> {/* Spacer */}
         </div>
