@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '../ui/Button';
-import { Youtube, Music, Instagram, Loader2, CheckCircle } from 'lucide-react';
+import { Youtube, Music, Instagram, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { PlatformType } from '../../types';
@@ -13,6 +13,7 @@ export const VideoInput: React.FC = () => {
   const [isValidating, setIsValidating] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const [platform, setPlatform] = useState<PlatformType | null>(null);
+  const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
   const navigate = useNavigate();
   const { addToast } = useToast();
 
@@ -29,23 +30,33 @@ export const VideoInput: React.FC = () => {
     if (!value) {
       setIsValid(false);
       setPlatform(null);
+      setFeedbackMsg(null);
       return;
     }
 
     setIsValidating(true);
+    setFeedbackMsg("Verificando link...");
+    
+    // Simulate validation delay
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
     const detected = detectPlatform(value);
     setPlatform(detected);
-
-    // Simulate debounce/validation
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
     setIsValid(detected !== null);
+    
+    if (detected) {
+        setFeedbackMsg("Link válido! Plataforma detectada.");
+    } else {
+        setFeedbackMsg("Link inválido ou plataforma não suportada.");
+    }
+    
     setIsValidating(false);
   };
 
   const handleAnalyze = async () => {
     if (!isValid) return;
     setIsValidating(true);
+    setFeedbackMsg("Processando vídeo...");
     
     try {
       // Use service layer
@@ -54,6 +65,7 @@ export const VideoInput: React.FC = () => {
     } catch (error) {
       console.error("Analysis failed", error);
       addToast("Falha ao analisar o vídeo. Verifique a URL e tente novamente.", "error");
+      setFeedbackMsg("Erro ao analisar vídeo.");
     } finally {
       setIsValidating(false);
     }
@@ -61,12 +73,20 @@ export const VideoInput: React.FC = () => {
 
   const getPlatformIcon = () => {
       switch(platform) {
-          case 'youtube': return <Youtube className="w-5 h-5 text-muted" />;
-          case 'tiktok': return <Music className="w-5 h-5 text-muted" />;
-          case 'instagram': return <Instagram className="w-5 h-5 text-muted" />;
+          case 'youtube': return <Youtube className="w-5 h-5 text-red-500" />;
+          case 'tiktok': return <Music className="w-5 h-5 text-cyan-400" />;
+          case 'instagram': return <Instagram className="w-5 h-5 text-pink-500" />;
           default: return null;
       }
   };
+
+  const borderColor = isValidating 
+    ? 'border-primary' 
+    : isValid 
+        ? 'border-success ring-1 ring-success/50' 
+        : url.length > 5 
+            ? 'border-error ring-1 ring-error/50' 
+            : 'border-accent';
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-8">
@@ -82,7 +102,11 @@ export const VideoInput: React.FC = () => {
                 setUrl(e.target.value);
                 validateUrl(e.target.value);
               }}
-              className="w-full h-14 px-4 pr-12 bg-card/50 backdrop-blur border border-accent rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-lg"
+              className={`
+                  w-full h-14 px-4 pr-12 bg-card/50 backdrop-blur border rounded-lg 
+                  focus:outline-none transition-all text-lg
+                  ${borderColor}
+              `}
             />
             
             {/* Platform Icon */}
@@ -92,7 +116,7 @@ export const VideoInput: React.FC = () => {
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0, opacity: 0 }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/50 p-1 rounded-full backdrop-blur-sm"
                 >
                   {getPlatformIcon()}
                 </motion.div>
@@ -120,16 +144,31 @@ export const VideoInput: React.FC = () => {
           </Button>
         </div>
 
+        {/* Status Message */}
+        <AnimatePresence>
+            {feedbackMsg && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className={`absolute -bottom-7 left-1 text-xs font-medium flex items-center gap-1.5 ${isValid ? 'text-success' : 'text-muted'}`}
+                >
+                   {isValid ? <CheckCircle className="w-3 h-3" /> : url.length > 5 ? <AlertCircle className="w-3 h-3 text-error" /> : null}
+                   <span className={!isValid && url.length > 5 ? 'text-error' : ''}>{feedbackMsg}</span>
+                </motion.div>
+            )}
+        </AnimatePresence>
+
         {/* Platform Badge */}
         <AnimatePresence>
-          {platform && (
+          {platform && isValid && (
             <motion.div
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="mt-2 text-sm text-muted flex items-center gap-1 absolute -bottom-8 left-1"
+              className="mt-2 text-sm text-muted flex items-center gap-1 absolute -bottom-12 right-1"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
-              Detectado: <span className="capitalize text-white font-medium">{platform}</span>
+              <span className="capitalize font-medium text-white/80">Plataforma {platform} Suportada</span>
             </motion.div>
           )}
         </AnimatePresence>

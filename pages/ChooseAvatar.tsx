@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Upload, User, History, Info, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Upload, User, History, Info, Zap, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '../components/ui/Button';
 import { AvatarGallery } from '../components/avatar/AvatarGallery';
@@ -29,14 +29,9 @@ const ChooseAvatar: React.FC = () => {
   };
 
   const handleBack = () => {
-      // Retrieve pending video to construct the correct back URL
-      const pendingVideo = localStorage.getItem('pendingVideo');
-      if (pendingVideo) {
-          const { videoId } = JSON.parse(pendingVideo);
-          navigate(`/preview?videoId=${videoId}`);
-      } else {
-          navigate('/');
-      }
+      // Navigate back to Preview. Preview page will handle state recovery from localStorage.
+      // This is more robust than trying to reconstruct URLs.
+      navigate('/preview');
   };
 
   return (
@@ -60,7 +55,11 @@ const ChooseAvatar: React.FC = () => {
              Reactor Studio
           </Link>
 
-          <div className="w-24" />
+          <Link to="/">
+             <Button variant="ghost" size="sm" icon={<Home className="w-4 h-4" />}>
+                 Home
+             </Button>
+          </Link>
         </div>
       </header>
 

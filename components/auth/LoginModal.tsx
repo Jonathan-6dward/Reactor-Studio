@@ -52,9 +52,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-5 rotate-3">
                 <Zap className="w-8 h-8 text-primary" />
               </div>
-              <h2 className="text-2xl font-bold mb-2">Salve seu progresso!</h2>
+              <h2 className="text-2xl font-bold mb-2">Quase lá!</h2>
               <p className="text-muted">
-                Faça login rapidamente para processar seu vídeo e garantir que ele não seja perdido.
+                Faça login para finalizar a criação do seu vídeo e garantir que ele fique salvo na sua conta.
               </p>
             </div>
 

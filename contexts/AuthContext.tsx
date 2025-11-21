@@ -34,13 +34,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = () => {
     // Simulate login API call
-    // Construct user explicitly to match User interface and avoid type errors
+    // Explicitly map properties to match User interface
     const mockUser: User = {
         id: 'user_123',
         name: MOCK_USER.name,
         email: MOCK_USER.email,
-        imageUrl: MOCK_USER.avatarUrl,
-        creditsLeft: 10, // Reset/Mock credits
+        imageUrl: MOCK_USER.avatarUrl, // Ensure this maps correctly from constant
+        creditsLeft: 10,
         isPro: false
     };
     

@@ -41,6 +41,7 @@ const Customize: React.FC = () => {
         return;
       }
 
+      // Deferred Login Check
       if (!isAuthenticated) {
           setShowLoginModal(true);
       } else {
@@ -82,6 +83,10 @@ const Customize: React.FC = () => {
     }
   };
 
+  const handleBack = () => {
+      navigate('/choose-avatar');
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <LoginModal 
@@ -95,7 +100,7 @@ const Customize: React.FC = () => {
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={() => navigate('/choose-avatar')} 
+            onClick={handleBack} 
             className="text-muted hover:text-white"
           >
             <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
@@ -300,7 +305,7 @@ const Customize: React.FC = () => {
                         <p className="text-xs text-center mt-3 text-muted">
                             {isAuthenticated 
                                 ? 'Ao continuar, você usará 1 crédito do seu plano.' 
-                                : 'Crie uma conta grátis para salvar e processar seu vídeo.'}
+                                : 'Faça login para salvar e processar seu vídeo gratuitamente.'}
                         </p>
                     </div>
                 </Card>

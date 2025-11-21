@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Loader2, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, Zap, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '../components/ui/Button';
 import { VideoPreviewCard } from '../components/video/VideoPreviewCard';
@@ -27,11 +27,12 @@ const Preview: React.FC = () => {
              // Update local storage to persist state for forward/backward navigation
              localStorage.setItem('pendingVideo', JSON.stringify(data));
            } else {
-             navigate('/'); // Not found
+             // Try to recover from local storage if API fails or ID invalid
+             recoverFromStorage();
            }
         } catch (e) {
            console.error(e);
-           navigate('/');
+           recoverFromStorage();
         }
       } 
       // 2. Try direct analysis URL
@@ -41,19 +42,23 @@ const Preview: React.FC = () => {
              setVideoData(data);
              localStorage.setItem('pendingVideo', JSON.stringify(data));
          } catch (e) {
-             navigate('/');
+             recoverFromStorage();
          }
       } 
-      // 3. Fallback to Local Storage (allows coming back from Choose Avatar without params)
+      // 3. Fallback to Local Storage
       else {
+        recoverFromStorage();
+      }
+      setLoading(false);
+    };
+
+    const recoverFromStorage = () => {
         const stored = localStorage.getItem('pendingVideo');
         if (stored) {
             setVideoData(JSON.parse(stored));
         } else {
             navigate('/');
         }
-      }
-      setLoading(false);
     };
 
     fetchVideo();
@@ -94,7 +99,11 @@ const Preview: React.FC = () => {
              Reactor Studio
           </Link>
           
-          <div className="w-24" /> {/* Spacer */}
+          <Link to="/">
+             <Button variant="ghost" size="sm" icon={<Home className="w-4 h-4" />}>
+                 Home
+             </Button>
+          </Link>
         </div>
       </header>
 
