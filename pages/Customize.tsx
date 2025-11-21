@@ -37,7 +37,7 @@ const Customize: React.FC = () => {
 
   const handleGenerateClick = () => {
       if (!videoData || !avatarData) {
-        addToast("Dados do vídeo ou avatar incompletos.", "error");
+        addToast("Dados do vídeo ou avatar incompletos. Por favor, reinicie o processo.", "error");
         return;
       }
 
@@ -72,7 +72,7 @@ const Customize: React.FC = () => {
         };
 
         const reaction = await api.createReaction(request);
-        addToast("Processamento iniciado!", "success");
+        addToast("Vídeo enviado para processamento!", "success");
         navigate(`/processing/${reaction.id}`);
 
     } catch (error) {

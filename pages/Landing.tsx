@@ -1,30 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Zap, ArrowRight, Github, LogIn } from 'lucide-react';
+import { Zap, ArrowRight, LogIn, LayoutDashboard } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { VideoInput } from '../components/video/VideoInput';
+import { useAuth } from '../contexts/AuthContext';
+import { LoginModal } from '../components/auth/LoginModal';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, login } = useAuth();
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
-  const handleLogin = () => {
-    navigate('/dashboard');
+  const handleAuthAction = () => {
+    if (isAuthenticated) {
+        navigate('/dashboard');
+    } else {
+        setShowLoginModal(true);
+    }
+  };
+
+  const handleLoginSuccess = () => {
+      login();
+      setShowLoginModal(false);
+      navigate('/dashboard');
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col selection:bg-primary/20">
+      <LoginModal 
+        isOpen={showLoginModal} 
+        onClose={() => setShowLoginModal(false)} 
+        onLogin={handleLoginSuccess}
+      />
+
       {/* Nav */}
-      <nav className="p-6 flex justify-between items-center max-w-7xl mx-auto w-full">
-        <div className="flex items-center gap-2">
+      <nav className="p-6 flex justify-between items-center max-w-7xl mx-auto w-full z-50 relative">
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
            <div className="w-8 h-8 bg-gradient-to-tr from-primary to-secondary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
               <Zap className="w-5 h-5 text-white" />
             </div>
             <span className="font-bold text-xl tracking-tight">Reactor Studio</span>
         </div>
         <div className="flex gap-4">
-            <Button variant="ghost" onClick={handleLogin} className="text-muted hover:text-white" icon={<LogIn className="w-4 h-4"/>}>
-                Entrar
+            <Button 
+                variant="ghost" 
+                onClick={handleAuthAction} 
+                className="text-muted hover:text-white" 
+                icon={isAuthenticated ? <LayoutDashboard className="w-4 h-4"/> : <LogIn className="w-4 h-4"/>}
+            >
+                {isAuthenticated ? 'Dashboard' : 'Entrar'}
             </Button>
         </div>
       </nav>
