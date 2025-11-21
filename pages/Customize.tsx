@@ -4,11 +4,14 @@ import { ArrowLeft, Play, Settings2, Zap, LayoutTemplate, Mic } from 'lucide-rea
 import { motion } from 'framer-motion';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { ReactionConfig } from '../types';
+import { CreateReactionRequest, VideoAnalysisResult, Avatar } from '../types';
+import { api } from '../services/api';
+import { useToast } from '../components/ui/Toast';
 
 const Customize: React.FC = () => {
   const navigate = useNavigate();
-  const [config, setConfig] = useState<Partial<ReactionConfig>>({
+  const { addToast } = useToast();
+  const [config, setConfig] = useState({
     style: 'quick',
     voice: 'female',
     position: 'top-right',
@@ -16,17 +19,59 @@ const Customize: React.FC = () => {
   });
   
   const [isGenerating, setIsGenerating] = useState(false);
+  const [videoData, setVideoData] = useState<VideoAnalysisResult | null>(null);
+  const [avatarData, setAvatarData] = useState<Avatar | null>(null);
 
-  const handleGenerate = () => {
+  useEffect(() => {
+    // Retrieve data from "Analysis" and "Avatar" steps (in this demo flow, using api service to fetch from temp storage)
+    // Note: In a real full app, we might pass ID in URL or Context. Here we grab from previous steps logic.
+    
+    // For this demo, we assume the user just came from ChooseAvatar, which saved selection to localstorage.
+    // And Preview saved video id.
+    
+    // Let's try to get the last uploaded video ID from the api service state if possible, 
+    // but since api is stateless class in this simple implementation, we rely on our 'temp' db logic.
+    // To make it robust for the "Customize" page reload, we'd need URL params. 
+    // For now, we assume the flow was followed.
+    
+    // ... (Simplified retrieval logic for demo)
+    const storedAvatar = localStorage.getItem('selectedAvatar');
+    if (storedAvatar) setAvatarData(JSON.parse(storedAvatar));
+
+    // Retrieving video is trickier without ID in URL in this specific file version. 
+    // We will assume the `pendingVideo` in localStorage (from VideoInput) is the one we are working on.
+    const pendingVideo = localStorage.getItem('pendingVideo');
+    if (pendingVideo) setVideoData(JSON.parse(pendingVideo));
+  }, []);
+
+  const handleGenerate = async () => {
+    if (!videoData || !avatarData) {
+        addToast("Dados do vídeo ou avatar incompletos.", "error");
+        return;
+    }
+    
     setIsGenerating(true);
     
-    // Emulate login check
-    // In a real app, we would check auth token here
-    setTimeout(() => {
-        // If not logged in, redirect to login/register, then to processing
-        // For now, we assume user "logs in" or is transparently handled
-        navigate('/processing/job_123');
-    }, 1000);
+    try {
+        const request: CreateReactionRequest = {
+            videoId: videoData.videoId,
+            avatarId: avatarData.id,
+            style: config.style,
+            voice: config.voice,
+            position: config.position,
+            size: config.size
+        };
+
+        const reaction = await api.createReaction(request);
+        addToast("Processamento iniciado!", "success");
+        navigate(`/processing/${reaction.id}`);
+
+    } catch (error) {
+        console.error("Failed to create reaction", error);
+        const msg = error instanceof Error ? error.message : "Falha desconhecida";
+        addToast(`Erro ao iniciar geração: ${msg}`, "error");
+        setIsGenerating(false);
+    }
   };
 
   return (
@@ -168,26 +213,39 @@ const Customize: React.FC = () => {
                     <div className="aspect-[9/16] relative bg-accent/20">
                         {/* Background Video Mock */}
                         <div className="absolute inset-0 flex items-center justify-center opacity-50">
-                            <Play className="w-12 h-12 text-muted" />
+                            {videoData?.thumbnailUrl ? (
+                                <img src={videoData.thumbnailUrl} className="w-full h-full object-cover" alt="Bg" />
+                            ) : (
+                                <div className="flex flex-col items-center">
+                                    <Play className="w-12 h-12 text-muted mb-2" />
+                                    <span className="text-xs text-muted">Sem vídeo</span>
+                                </div>
+                            )}
                         </div>
                         
                         {/* Avatar Overlay Mock */}
                         <motion.div 
-                            className="absolute w-[25%] aspect-square bg-primary rounded-lg shadow-xl overflow-hidden border-2 border-white/20"
+                            className="absolute aspect-square bg-primary rounded-lg shadow-xl overflow-hidden border-2 border-white/20"
                             style={{
-                                top: config.position?.includes('top') ? '10%' : 'auto',
-                                bottom: config.position?.includes('bottom') ? '10%' : 'auto',
-                                left: config.position?.includes('left') ? '10%' : 'auto',
-                                right: config.position?.includes('right') ? '10%' : 'auto',
+                                top: config.position?.includes('top') ? '5%' : 'auto',
+                                bottom: config.position?.includes('bottom') ? '5%' : 'auto',
+                                left: config.position?.includes('left') ? '5%' : 'auto',
+                                right: config.position?.includes('right') ? '5%' : 'auto',
                                 width: `${config.size}%`,
                             }}
                             layout
                         >
-                            <img 
-                                src="https://picsum.photos/seed/avatar1/200/200" 
-                                className="w-full h-full object-cover" 
-                                alt="Avatar"
-                            />
+                            {avatarData ? (
+                                <img 
+                                    src={avatarData.previewUrl} 
+                                    className="w-full h-full object-cover" 
+                                    alt="Avatar"
+                                />
+                            ) : (
+                                <div className="w-full h-full bg-gray-500 flex items-center justify-center text-white/50 text-xs text-center p-1">
+                                    Sem Avatar
+                                </div>
+                            )}
                         </motion.div>
 
                         {/* Controls Mock */}
@@ -195,7 +253,7 @@ const Customize: React.FC = () => {
                             <div className="h-1 w-full bg-white/30 rounded-full mb-2"></div>
                             <div className="flex justify-between text-xs text-white/70">
                                 <span>0:00</span>
-                                <span>1:24</span>
+                                <span>0:{videoData?.duration || '00'}</span>
                             </div>
                         </div>
                     </div>
@@ -210,7 +268,7 @@ const Customize: React.FC = () => {
                             Gerar Vídeo Mágico ✨
                         </Button>
                         <p className="text-xs text-center mt-3 text-muted">
-                            Ao continuar, você concorda com nossos termos de uso.
+                            Ao continuar, você usará 1 crédito.
                         </p>
                     </div>
                 </Card>

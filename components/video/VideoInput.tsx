@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { PlatformType } from '../../types';
 import { UploadDropzone } from './UploadDropzone';
+import { api } from '../../services/api';
+import { useToast } from '../ui/Toast';
 
 export const VideoInput: React.FC = () => {
   const [url, setUrl] = useState('');
@@ -12,6 +14,7 @@ export const VideoInput: React.FC = () => {
   const [isValid, setIsValid] = useState(false);
   const [platform, setPlatform] = useState<PlatformType | null>(null);
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   // Detect platform
   const detectPlatform = (url: string): PlatformType | null => {
@@ -33,8 +36,8 @@ export const VideoInput: React.FC = () => {
     const detected = detectPlatform(value);
     setPlatform(detected);
 
-    // Simulate API validation delay
-    await new Promise(resolve => setTimeout(resolve, 600));
+    // Simulate debounce/validation
+    await new Promise(resolve => setTimeout(resolve, 500));
     
     setIsValid(detected !== null);
     setIsValidating(false);
@@ -42,23 +45,18 @@ export const VideoInput: React.FC = () => {
 
   const handleAnalyze = async () => {
     if (!isValid) return;
+    setIsValidating(true);
     
-    // Mock data fetching based on URL
-    const mockData = {
-        url,
-        platform,
-        timestamp: Date.now(),
-        title: 'Exemplo de Vídeo Viral',
-        duration: 84,
-        resolution: '1080p',
-        thumbnailUrl: `https://picsum.photos/seed/${platform}/800/450`
-    };
-
-    // Save to localStorage temporary
-    localStorage.setItem('pendingVideo', JSON.stringify(mockData));
-
-    // Redirect to preview
-    navigate(`/preview?url=${encodeURIComponent(url)}`);
+    try {
+      // Use service layer
+      const result = await api.analyzeVideo(url);
+      navigate(`/preview?videoId=${result.videoId}`);
+    } catch (error) {
+      console.error("Analysis failed", error);
+      addToast("Falha ao analisar o vídeo. Verifique a URL e tente novamente.", "error");
+    } finally {
+      setIsValidating(false);
+    }
   };
 
   const getPlatformIcon = () => {
@@ -114,8 +112,9 @@ export const VideoInput: React.FC = () => {
             size="lg"
             onClick={handleAnalyze}
             disabled={!isValid || isValidating}
-            className={`h-14 px-8 text-lg min-w-[140px] ${isValid ? 'animate-pulse shadow-[0_0_20px_rgba(59,130,246,0.4)]' : ''}`}
-            icon={isValid ? <CheckCircle className="w-5 h-5" /> : undefined}
+            isLoading={isValidating && isValid}
+            className={`h-14 px-8 text-lg min-w-[140px] ${isValid && !isValidating ? 'animate-pulse shadow-[0_0_20px_rgba(59,130,246,0.4)]' : ''}`}
+            icon={isValid && !isValidating ? <CheckCircle className="w-5 h-5" /> : undefined}
           >
             Analisar
           </Button>

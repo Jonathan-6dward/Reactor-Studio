@@ -1,47 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { Layout } from '../components/Layout';
 import { ProgressBar } from '../components/ui/ProgressBar';
 import { Card } from '../components/ui/Card';
-import { PROCESSING_STEPS } from '../constants';
+import { api } from '../services/api';
+import { VideoStatus } from '../types';
+import { useToast } from '../components/ui/Toast';
 
 const Processing: React.FC = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const { addToast } = useToast();
   const [progress, setProgress] = useState(0);
-  const [stepIndex, setStepIndex] = useState(0);
-
+  const [statusText, setStatusText] = useState("Iniciando...");
+  const hasFailedRef = useRef(false);
+  
   useEffect(() => {
-    // Simulate processing
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
+    if (!id) return;
+
+    const pollStatus = async () => {
+      try {
+        const reaction = await api.getReaction(id);
+        if (!reaction) return;
+
+        setProgress(reaction.progress);
+        if (reaction.currentStep) setStatusText(reaction.currentStep);
+
+        if (reaction.status === VideoStatus.COMPLETED) {
+          setTimeout(() => {
+            navigate(`/result/${id}`);
+          }, 800);
+        } else if (reaction.status === VideoStatus.FAILED) {
+            setStatusText("Falha no processamento. Tente novamente.");
+            if (!hasFailedRef.current) {
+                addToast("O processamento do vídeo falhou. Por favor, tente novamente.", "error");
+                hasFailedRef.current = true;
+            }
         }
-        // Non-linear progress for realism
-        const increment = Math.random() * 2; 
-        return Math.min(prev + increment, 100);
-      });
-    }, 100);
+      } catch (e) {
+        console.error("Polling error", e);
+      }
+    };
 
+    // Immediate check
+    pollStatus();
+
+    // Interval check
+    const interval = setInterval(pollStatus, 1500);
     return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    // Update text based on progress
-    const stepsCount = PROCESSING_STEPS.length;
-    const threshold = 100 / stepsCount;
-    const current = Math.min(Math.floor(progress / threshold), stepsCount - 1);
-    setStepIndex(current);
-
-    if (progress === 100) {
-      setTimeout(() => {
-        navigate('/result/vid_new_123');
-      }, 1000);
-    }
-  }, [progress, navigate]);
+  }, [id, navigate, addToast]);
 
   return (
     <Layout>
@@ -60,7 +70,7 @@ const Processing: React.FC = () => {
           </motion.div>
 
           <h2 className="text-2xl font-bold mb-2">Criando Mágica</h2>
-          <p className="text-muted mb-8">Por favor, mantenha esta aba aberta enquanto geramos seu vídeo de reação.</p>
+          <p className="text-muted mb-8">Por favor, mantenha esta aba aberta enquanto geramos seu vídeo.</p>
 
           <Card className="p-8 bg-card/50 border-primary/20">
             <ProgressBar progress={progress} className="mb-4" />
@@ -68,13 +78,13 @@ const Processing: React.FC = () => {
             <div className="h-8 relative overflow-hidden">
                 <AnimatePresence mode="wait">
                     <motion.p
-                        key={stepIndex}
+                        key={statusText} // Animate when text changes
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         className="text-sm font-medium text-primary absolute w-full"
                     >
-                        {PROCESSING_STEPS[stepIndex]}
+                        {statusText}
                     </motion.p>
                 </AnimatePresence>
             </div>

@@ -6,9 +6,12 @@ import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { BatchSourceType } from '../types';
 import { MOCK_USER } from '../constants';
+import { api } from '../services/api';
+import { useToast } from '../components/ui/Toast';
 
 const BatchDownload: React.FC = () => {
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const [sourceType, setSourceType] = useState<BatchSourceType>('urls');
   const [loading, setLoading] = useState(false);
 
@@ -21,13 +24,25 @@ const BatchDownload: React.FC = () => {
   const [maxVideos, setMaxVideos] = useState('10');
   const [sortBy, setSortBy] = useState('recent');
 
-  const handleStartDownload = () => {
+  const handleStartDownload = async () => {
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      navigate(`/batch-download/batch_${Date.now()}`);
-    }, 1500);
+    
+    try {
+        let config = {};
+        if (sourceType === 'urls') config = { urls: urls.split('\n') };
+        else if (sourceType === 'channel') config = { channelUrl, maxVideos, sortBy };
+        else if (sourceType === 'playlist') config = { playlistUrl, maxVideos };
+        else if (sourceType === 'profile') config = { username, platform, maxVideos };
+
+        const batch = await api.createBatch(sourceType, config);
+        addToast("Download em massa iniciado com sucesso!", "success");
+        navigate(`/batch-download/${batch.id}`);
+    } catch (error) {
+        console.error(error);
+        addToast("Erro ao iniciar download. Tente novamente.", "error");
+    } finally {
+        setLoading(false);
+    }
   };
 
   return (

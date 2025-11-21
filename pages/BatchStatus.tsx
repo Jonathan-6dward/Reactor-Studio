@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { CheckCircle, AlertCircle, ArrowLeft, Download, RefreshCcw } from 'lucide-react';
@@ -5,37 +6,50 @@ import { Layout } from '../components/Layout';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { ProgressBar } from '../components/ui/ProgressBar';
-import { MOCK_DOWNLOADED_VIDEOS } from '../constants';
 import { DownloadedVideo } from '../types';
+import { api } from '../services/api';
 
 const BatchStatus: React.FC = () => {
   const { id } = useParams();
   const [progress, setProgress] = useState(0);
   const [downloadedVideos, setDownloadedVideos] = useState<DownloadedVideo[]>([]);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [totalVideos, setTotalVideos] = useState(0);
 
   useEffect(() => {
-    // Simulate batch processing
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsCompleted(true);
-          return 100;
-        }
-        return prev + 5;
-      });
-    }, 500);
+    if (!id) return;
 
+    const pollBatch = async () => {
+       try {
+           const batch = await api.getBatch(id);
+           if (batch) {
+               setTotalVideos(batch.totalVideos || 0);
+               
+               if (batch.downloadedVideos) {
+                   setDownloadedVideos(batch.downloadedVideos);
+               }
+
+               // Calculate progress roughly
+               const estTotal = batch.totalVideos || 10;
+               const current = batch.downloadedCount;
+               const calcProgress = estTotal > 0 ? (current / estTotal) * 100 : 0;
+               
+               if (batch.status === 'completed') {
+                   setProgress(100);
+                   setIsCompleted(true);
+               } else {
+                   setProgress(calcProgress);
+               }
+           }
+       } catch (e) {
+           console.error(e);
+       }
+    };
+
+    pollBatch();
+    const interval = setInterval(pollBatch, 1500);
     return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    // Simulate finding new videos as progress increases
-    if (progress > 0 && progress % 20 === 0 && downloadedVideos.length < MOCK_DOWNLOADED_VIDEOS.length) {
-        setDownloadedVideos(prev => [...prev, MOCK_DOWNLOADED_VIDEOS[prev.length]]);
-    }
-  }, [progress]);
+  }, [id]);
 
   return (
     <Layout>

@@ -1,19 +1,38 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Download, Share2, RefreshCcw, Check } from 'lucide-react';
+import { Download, Share2, RefreshCcw, Check, Loader2 } from 'lucide-react';
 import { Layout } from '../components/Layout';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import Confetti from 'react-confetti';
+import { api } from '../services/api';
+import { Reaction } from '../types';
+import { PRESET_AVATARS } from '../constants';
 
 const Result: React.FC = () => {
   const { id } = useParams();
+  const [reaction, setReaction] = useState<Reaction | null>(null);
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+        if (id) {
+            const data = await api.getReaction(id);
+            setReaction(data);
+        }
+        setLoading(false);
+    };
+    fetchData();
+  }, [id]);
 
   const handleCopy = () => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin text-primary"/></div>;
+  if (!reaction) return <div className="p-10 text-center">Reaction Not Found</div>;
 
   return (
     <Layout>
@@ -23,7 +42,7 @@ const Result: React.FC = () => {
            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
              Vídeo de Reação Pronto!
            </h1>
-           <p className="text-muted">Seu avatar IA reagiu com sucesso ao seu vídeo.</p>
+           <p className="text-muted">Seu avatar IA reagiu com sucesso ao vídeo <b>{reaction.videoTitle}</b>.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -33,7 +52,7 @@ const Result: React.FC = () => {
                  <div className="aspect-video bg-black rounded-lg relative flex items-center justify-center group">
                     {/* Mock Video Player */}
                     <img 
-                        src="https://picsum.photos/seed/result/800/450" 
+                        src={reaction.thumbnailUrl || "https://picsum.photos/seed/result/800/450"} 
                         className="w-full h-full object-cover opacity-60"
                         alt="Resultado do Vídeo"
                     />
@@ -49,8 +68,8 @@ const Result: React.FC = () => {
                             <div className="w-1/3 h-full bg-primary rounded-full"></div>
                         </div>
                         <div className="flex justify-between text-xs font-medium">
-                            <span>0:23</span>
-                            <span>1:45</span>
+                            <span>0:00</span>
+                            <span>{Math.floor(reaction.videoDuration / 60)}:{(reaction.videoDuration % 60).toString().padStart(2, '0')}</span>
                         </div>
                     </div>
                  </div>
@@ -63,16 +82,16 @@ const Result: React.FC = () => {
                   <h3 className="font-semibold mb-4 text-lg">Detalhes</h3>
                   <div className="space-y-3 text-sm">
                       <div className="flex justify-between border-b border-accent pb-2">
-                          <span className="text-muted">Duração</span>
-                          <span>1m 45s</span>
+                          <span className="text-muted">Duração Original</span>
+                          <span>{Math.floor(reaction.videoDuration / 60)}m {reaction.videoDuration % 60}s</span>
                       </div>
                       <div className="flex justify-between border-b border-accent pb-2">
-                          <span className="text-muted">Resolução</span>
-                          <span>1080p</span>
+                          <span className="text-muted">Estilo</span>
+                          <span className="capitalize">{reaction.style}</span>
                       </div>
-                       <div className="flex justify-between border-b border-accent pb-2">
-                          <span className="text-muted">Tamanho</span>
-                          <span>45 MB</span>
+                      <div className="flex justify-between border-b border-accent pb-2">
+                          <span className="text-muted">Avatar</span>
+                          <span>{PRESET_AVATARS.find(a => a.id === reaction.avatarId)?.name || "Custom"}</span>
                       </div>
                   </div>
 

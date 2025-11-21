@@ -1,30 +1,53 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '../components/ui/Button';
 import { VideoPreviewCard } from '../components/video/VideoPreviewCard';
-import { PendingVideoData } from '../types';
+import { VideoAnalysisResult } from '../types';
+import { api } from '../services/api';
 
 const Preview: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [videoData, setVideoData] = useState<PendingVideoData | null>(null);
+  const [videoData, setVideoData] = useState<VideoAnalysisResult | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch data from localStorage or URL params
-    // In a real app, we might fetch from API using the ID
-    const storedData = localStorage.getItem('pendingVideo');
-    
-    if (storedData) {
-        setVideoData(JSON.parse(storedData));
-        setLoading(false);
-    } else {
-        // Fallback or redirect
+    const fetchVideo = async () => {
+      const videoId = searchParams.get('videoId');
+      // Fallback to url parameter if just pasted (less robust but handles direct link case if implemented)
+      const url = searchParams.get('url'); 
+      
+      if (videoId) {
+        try {
+           const data = await api.getVideo(videoId);
+           if (data) {
+             setVideoData(data);
+           } else {
+             navigate('/'); // Not found
+           }
+        } catch (e) {
+           console.error(e);
+           navigate('/');
+        }
+      } else if (url) {
+         // Should ideally be handled by VideoInput, but for safety:
+         try {
+             const data = await api.analyzeVideo(url);
+             setVideoData(data);
+         } catch (e) {
+             navigate('/');
+         }
+      } else {
         navigate('/');
-    }
-  }, [navigate]);
+      }
+      setLoading(false);
+    };
+
+    fetchVideo();
+  }, [navigate, searchParams]);
 
   const handleNext = () => {
     navigate('/choose-avatar');

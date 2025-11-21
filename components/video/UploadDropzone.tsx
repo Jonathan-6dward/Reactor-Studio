@@ -2,35 +2,49 @@ import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, Film } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../ui/Toast';
 
 export const UploadDropzone: React.FC = () => {
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+  const onDrop = useCallback(async (acceptedFiles: File[], fileRejections: any[]) => {
+    if (fileRejections.length > 0) {
+        const errors = fileRejections[0].errors.map((e: any) => e.message).join(', ');
+        addToast(`Erro no arquivo: ${errors}`, 'error');
+        return;
+    }
+
     const file = acceptedFiles[0];
     if (!file) return;
 
-    // Emulate upload process
-    // In a real app, we would upload to API here.
-    // For this demo, we simulate a successful upload and store metadata.
-    
-    const mockVideoId = `vid_upload_${Date.now()}`;
-    
-    // Save to localStorage
-    localStorage.setItem('pendingVideo', JSON.stringify({
-      videoId: mockVideoId,
-      url: URL.createObjectURL(file), // Temporary local URL for preview
-      platform: 'upload',
-      timestamp: Date.now(),
-      title: file.name,
-      duration: 45, // Mock duration
-      resolution: '1080p',
-      thumbnailUrl: 'https://picsum.photos/seed/upload/800/450'
-    }));
+    try {
+        // Emulate upload process
+        // In a real app, we would upload to API here.
+        // For this demo, we simulate a successful upload and store metadata.
+        
+        const mockVideoId = `vid_upload_${Date.now()}`;
+        
+        // Save to localStorage
+        localStorage.setItem('pendingVideo', JSON.stringify({
+        videoId: mockVideoId,
+        url: URL.createObjectURL(file), // Temporary local URL for preview
+        platform: 'upload',
+        timestamp: Date.now(),
+        title: file.name,
+        duration: 45, // Mock duration
+        resolution: '1080p',
+        thumbnailUrl: 'https://picsum.photos/seed/upload/800/450'
+        }));
 
-    // Redirect to preview
-    navigate(`/preview?videoId=${mockVideoId}`);
-  }, [navigate]);
+        addToast("Upload realizado com sucesso!", "success");
+        // Redirect to preview
+        navigate(`/preview?videoId=${mockVideoId}`);
+    } catch (e) {
+        console.error(e);
+        addToast("Falha ao processar o upload do vídeo.", "error");
+    }
+  }, [navigate, addToast]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -41,6 +55,7 @@ export const UploadDropzone: React.FC = () => {
     },
     maxSize: 100 * 1024 * 1024, // 100MB
     maxFiles: 1,
+    onError: (err) => addToast(err.message, 'error')
   });
 
   return (

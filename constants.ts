@@ -1,3 +1,4 @@
+
 import { Avatar, VideoProject, VideoStatus, BatchDownloadItem, DownloadedVideo } from './types';
 
 export const MOCK_USER = {
@@ -56,6 +57,7 @@ export const PROCESSING_STEPS = [
 export const MOCK_BATCH_HISTORY: BatchDownloadItem[] = [
   {
     id: 'batch_1',
+    userId: 'user_1',
     sourceType: 'channel',
     status: 'completed',
     totalVideos: 10,
@@ -66,6 +68,7 @@ export const MOCK_BATCH_HISTORY: BatchDownloadItem[] = [
   },
   {
     id: 'batch_2',
+    userId: 'user_1',
     sourceType: 'urls',
     status: 'completed',
     totalVideos: 5,
@@ -76,6 +79,7 @@ export const MOCK_BATCH_HISTORY: BatchDownloadItem[] = [
   },
   {
     id: 'batch_3',
+    userId: 'user_1',
     sourceType: 'playlist',
     status: 'failed',
     totalVideos: 50,
@@ -87,11 +91,11 @@ export const MOCK_BATCH_HISTORY: BatchDownloadItem[] = [
 ];
 
 export const MOCK_DOWNLOADED_VIDEOS: DownloadedVideo[] = [
-  { videoId: 'v1', title: 'Tech Review 2024', duration: '10:20', thumbnailUrl: 'https://picsum.photos/seed/v1/120/68', url: '#' },
-  { videoId: 'v2', title: 'Unboxing Novo Gadget', duration: '05:15', thumbnailUrl: 'https://picsum.photos/seed/v2/120/68', url: '#' },
-  { videoId: 'v3', title: 'Setup Tour 2023', duration: '15:00', thumbnailUrl: 'https://picsum.photos/seed/v3/120/68', url: '#' },
-  { videoId: 'v4', title: 'Dicas de Produtividade', duration: '08:45', thumbnailUrl: 'https://picsum.photos/seed/v4/120/68', url: '#' },
-  { videoId: 'v5', title: 'Vlog Semanal #40', duration: '12:30', thumbnailUrl: 'https://picsum.photos/seed/v5/120/68', url: '#' },
+  { videoId: 'v1', title: 'Tech Review 2024', duration: '10:20', thumbnailUrl: 'https://picsum.photos/seed/v1/120/68', url: '#' , platform: 'youtube' },
+  { videoId: 'v2', title: 'Unboxing Novo Gadget', duration: '05:15', thumbnailUrl: 'https://picsum.photos/seed/v2/120/68', url: '#', platform: 'youtube' },
+  { videoId: 'v3', title: 'Setup Tour 2023', duration: '15:00', thumbnailUrl: 'https://picsum.photos/seed/v3/120/68', url: '#', platform: 'youtube' },
+  { videoId: 'v4', title: 'Dicas de Produtividade', duration: '08:45', thumbnailUrl: 'https://picsum.photos/seed/v4/120/68', url: '#', platform: 'youtube' },
+  { videoId: 'v5', title: 'Vlog Semanal #40', duration: '12:30', thumbnailUrl: 'https://picsum.photos/seed/v5/120/68', url: '#', platform: 'youtube' },
 ];
 
 export const USER_STATS = {

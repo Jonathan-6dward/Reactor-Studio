@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, Video, LogOut, Settings, Zap, Download } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, Video, LogOut, Settings, Zap, Download, Image } from 'lucide-react';
 import { MOCK_USER } from '../constants';
 import { Button } from './ui/Button';
 
@@ -55,6 +55,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               icon={<Download className="w-4 h-4" />}
             >
               Download em Massa
+            </Button>
+          </Link>
+
+          <Link to="/image-generator">
+            <Button 
+              variant={isActive('/image-generator') ? 'secondary' : 'ghost'} 
+              className="w-full justify-start" 
+              icon={<Image className="w-4 h-4" />}
+            >
+              Gerador de Imagens
             </Button>
           </Link>
 
